@@ -10,8 +10,3 @@ insert_final_newline = true
 
 [*.Generated.cs]
 generated_code = true
-
-[*.{cs,vb}]
-dotnet_diagnostic.CA1510.severity = none
-dotnet_diagnostic.CA1512.severity = none
-dotnet_diagnostic.CA1859.severity = none
