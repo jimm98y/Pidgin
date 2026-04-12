@@ -36,5 +36,31 @@ public class ReaderTokenStream : ITokenStream<char>
     /// </summary>
     /// <param name="buffer">The buffer to read tokens into.</param>
     /// <returns>The actual number of tokens read.</returns>
-    public int Read(Span<char> buffer) => _input.Read(buffer);
+    public int Read(Span<char> buffer)
+    {
+#if NETSTANDARD2_0
+        var temp = new char[buffer.Length];
+        var read = _input.Read(temp, 0, buffer.Length);
+        temp.CopyTo(buffer);
+        return read;
+#else
+        return _input.Read(buffer);
+#endif
+    }
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Push some un-consumed tokens back into the stream.
+    /// <see cref="Parser{TToken, T}"/>s call this method when they are finished parsing.
+    ///
+    /// <see cref="ITokenStream{TToken}"/> implementations may override this
+    /// method if they want to implement resumable parsing.
+    /// (See <see cref="ResumableTokenStream{TToken}"/>.)
+    /// The default implementation does nothing and discards the <paramref name="leftovers"/>.
+    /// </summary>
+    /// <param name="leftovers">The leftovers to push back into the stream.</param>
+    public void Return(ReadOnlySpan<char> leftovers)
+    {
+    }
+#endif
 }

@@ -1,6 +1,8 @@
 using System;
+#if !NETSTANDARD2_0
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+#endif
 
 using Pidgin.Configuration;
 
@@ -54,10 +56,20 @@ public partial struct ParseState<TToken>
         var end = (int)(location - _lastSourcePosDeltaLocation);
 
         // coerce _span to Span<char>
+#if NETSTANDARD2_0
+        var inputBuffer = new char[_span.Length];
+        for (var s = 0; s < _span.Length; s++)
+        {
+            inputBuffer[s] = (char)(object)_span[s]!;
+        }
+
+        var input = inputBuffer.AsSpan().Slice(start, end);
+#else
         var input = MemoryMarshal.CreateSpan(
             ref Unsafe.As<TToken, char>(ref MemoryMarshal.GetReference(_span)),
             _span.Length
         ).Slice(start, end);
+#endif
 
         var lines = 0;
         var cols = 0;

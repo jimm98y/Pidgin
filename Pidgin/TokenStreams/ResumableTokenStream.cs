@@ -1,7 +1,9 @@
 using System;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
+#if !NETSTANDARD2_0
 using System.Runtime.CompilerServices;
+#endif
 
 namespace Pidgin.TokenStreams;
 
@@ -17,7 +19,11 @@ namespace Pidgin.TokenStreams;
 )]
 public class ResumableTokenStream<TToken> : ITokenStream<TToken>, IDisposable
 {
+#if NETSTANDARD2_0
+    private static readonly bool _needsClear = true;
+#else
     private static readonly bool _needsClear = RuntimeHelpers.IsReferenceOrContainsReferences<TToken>();
+#endif
     private readonly ArrayPool<TToken> _pool;
     private readonly ITokenStream<TToken> _next;
     private TToken[]? _buffer = null;
@@ -115,4 +121,11 @@ public class ResumableTokenStream<TToken> : ITokenStream<TToken>, IDisposable
             _bufferStart = 0;
         }
     }
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Chunk Size Hint.
+    /// </summary>
+    public int ChunkSizeHint => 1024;
+#endif
 }

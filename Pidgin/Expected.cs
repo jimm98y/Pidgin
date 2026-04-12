@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Immutable;
+#if !NETSTANDARD2_0
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+#endif
 using System.Text;
 
 namespace Pidgin;
@@ -196,9 +198,22 @@ public readonly struct Expected<TToken> : IEquatable<Expected<TToken>>, ICompara
     public static bool operator <=(Expected<TToken> left, Expected<TToken> right)
         => left.CompareTo(right) <= 0;
 
+#if NETSTANDARD2_0
+    private static ReadOnlySpan<char> UnsafeCastToChar(ReadOnlySpan<TToken> span)
+    {
+        var chars = new char[span.Length];
+        for (var i = 0; i < span.Length; i++)
+        {
+            chars[i] = (char)(object)span[i]!;
+        }
+
+        return chars;
+    }
+#else
     private static ReadOnlySpan<char> UnsafeCastToChar(ReadOnlySpan<TToken> span)
         => MemoryMarshal.CreateReadOnlySpan(
             ref Unsafe.As<TToken, char>(ref MemoryMarshal.GetReference(span)),
             span.Length
         );
+#endif
 }
