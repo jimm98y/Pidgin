@@ -60,12 +60,12 @@ internal class ConditionalWeakReference
     }
 #else
     private readonly WeakReference _target;
-    private readonly WeakReference _dependent;
+    private readonly object? _dependent;
 
     public ConditionalWeakReference(object? target, object? dependent)
     {
         _target = new WeakReference(target);
-        _dependent = new WeakReference(dependent);
+        _dependent = dependent;
     }
 
     public object? Target
@@ -82,7 +82,7 @@ internal class ConditionalWeakReference
     {
         get
         {
-            var result = _dependent.Target;
+            var result = _dependent;
             GC.KeepAlive(this);
             return result;
         }
@@ -92,7 +92,7 @@ internal class ConditionalWeakReference
     {
         get
         {
-            var result = (_target.Target, _dependent.Target);
+            var result = (_target.Target, _dependent);
             GC.KeepAlive(this);
             return result;
         }
