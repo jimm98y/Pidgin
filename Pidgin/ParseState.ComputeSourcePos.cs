@@ -1,7 +1,10 @@
 using System;
-#if !NETSTANDARD2_0
+
+#if NETCOREAPP2_1_OR_GREATER
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+#else
+using System.Text;
 #endif
 
 using Pidgin.Configuration;
@@ -55,22 +58,19 @@ public partial struct ParseState<TToken>
         var start = (int)(_lastSourcePosDeltaLocation - _bufferStartLocation);
         var end = (int)(location - _lastSourcePosDeltaLocation);
 
+#if NETCOREAPP2_1_OR_GREATER
         // coerce _span to Span<char>
-#if NETSTANDARD2_0
-        var inputBuffer = new char[_span.Length];
-        for (var s = 0; s < _span.Length; s++)
-        {
-            inputBuffer[s] = (char)(object)_span[s]!;
-        }
-
-        var input = inputBuffer.AsSpan().Slice(start, end);
-#else
         var input = MemoryMarshal.CreateSpan(
             ref Unsafe.As<TToken, char>(ref MemoryMarshal.GetReference(_span)),
             _span.Length
         ).Slice(start, end);
+#else
+        var input = new StringBuilder(end);
+        for (var j = start; j < start + end; j++)
+        {
+            input.Append(_span[j]);
+        }
 #endif
-
         var lines = 0;
         var cols = 0;
 
