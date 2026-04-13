@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-#if NETSTANDARD2_0
+#if !NETCOREAPP2_1_OR_GREATER
 using System.Buffers;
 #endif
 
@@ -41,7 +41,9 @@ public class ReaderTokenStream : ITokenStream<char>
     /// <returns>The actual number of tokens read.</returns>
     public int Read(Span<char> buffer)
     {
-#if NETSTANDARD2_0
+#if NETCOREAPP2_1_OR_GREATER
+        return _input.Read(buffer);
+#else
         var temp = ArrayPool<char>.Shared.Rent(buffer.Length);
         try
         {
@@ -57,8 +59,6 @@ public class ReaderTokenStream : ITokenStream<char>
         {
             ArrayPool<char>.Shared.Return(temp);
         }
-#else
-        return _input.Read(buffer);
 #endif
     }
 
