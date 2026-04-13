@@ -1,5 +1,5 @@
 using System;
-#if NET8_0_OR_GREATER
+#if NET6_0_OR_GREATER
 using System.Runtime;
 #endif
 
@@ -11,7 +11,7 @@ namespace Pidgin.Incremental;
 /// </summary>
 internal class ConditionalWeakReference
 {
-#if NET8_0_OR_GREATER
+#if NET6_0_OR_GREATER
     // DependentHandle is a mutable struct - don't make this readonly
     private DependentHandle _handle;
 
