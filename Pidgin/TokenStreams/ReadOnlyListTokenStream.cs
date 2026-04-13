@@ -50,7 +50,7 @@ public sealed class ReadOnlyListTokenStream<TToken> : ITokenStream<TToken>
         return actualLength;
     }
 
-#if NETSTANDARD2_0
+#if !NETCOREAPP3_0_OR_GREATER
     /// <summary>
     /// Push some un-consumed tokens back into the stream.
     /// <see cref="Parser{TToken, T}"/>s call this method when they are finished parsing.

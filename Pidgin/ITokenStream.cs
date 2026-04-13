@@ -38,12 +38,12 @@ public interface ITokenStream<TToken>
         "CA1716:Rename member so that it no longer conflicts with a reserved language keyword",
         Justification = "Would be a breaking change"
     )]
-#if NETSTANDARD2_0
-    public void Return(ReadOnlySpan<TToken> leftovers);
-#else
+#if NETCOREAPP3_0_OR_GREATER
     public void Return(ReadOnlySpan<TToken> leftovers)
     {
     }
+#else
+    public void Return(ReadOnlySpan<TToken> leftovers);
 #endif
 
     /// <summary>
@@ -57,9 +57,9 @@ public interface ITokenStream<TToken>
     /// The default is 1024.
     /// </summary>
     /// <returns>The default number of tokens to request when calling <see cref="Read"/>.</returns>
-#if NETSTANDARD2_0
-    public int ChunkSizeHint { get; }
-#else
+#if NETCOREAPP3_0_OR_GREATER
     public int ChunkSizeHint => 1024;
+#else
+    public int ChunkSizeHint { get; }
 #endif
 }

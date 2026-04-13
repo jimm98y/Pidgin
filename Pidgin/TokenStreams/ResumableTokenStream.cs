@@ -1,7 +1,7 @@
 using System;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
-#if !NETSTANDARD2_0
+#if NETCOREAPP2_0_OR_GREATER
 using System.Runtime.CompilerServices;
 #endif
 
@@ -122,7 +122,7 @@ public class ResumableTokenStream<TToken> : ITokenStream<TToken>, IDisposable
         }
     }
 
-#if NETSTANDARD2_0
+#if !NETCOREAPP3_0_OR_GREATER
     /// <summary>
     /// Chunk Size Hint.
     /// </summary>
