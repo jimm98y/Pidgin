@@ -19,10 +19,10 @@ namespace Pidgin.TokenStreams;
 )]
 public class ResumableTokenStream<TToken> : ITokenStream<TToken>, IDisposable
 {
-#if NETSTANDARD2_0
-    private static readonly bool _needsClear = true;
-#else
+#if NETCOREAPP2_0_OR_GREATER
     private static readonly bool _needsClear = RuntimeHelpers.IsReferenceOrContainsReferences<TToken>();
+#else
+    private static readonly bool _needsClear = true;
 #endif
     private readonly ArrayPool<TToken> _pool;
     private readonly ITokenStream<TToken> _next;
