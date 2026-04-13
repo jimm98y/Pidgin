@@ -1,6 +1,9 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+#if NETSTANDARD2_0
+using System.Buffers;
+#endif
 
 namespace Pidgin.TokenStreams;
 
@@ -39,10 +42,21 @@ public class ReaderTokenStream : ITokenStream<char>
     public int Read(Span<char> buffer)
     {
 #if NETSTANDARD2_0
-        var temp = new char[buffer.Length];
-        var read = _input.Read(temp, 0, buffer.Length);
-        temp.CopyTo(buffer);
-        return read;
+        var temp = ArrayPool<char>.Shared.Rent(buffer.Length);
+        try
+        {
+            var read = _input.Read(temp, 0, buffer.Length);
+            if (read > 0)
+            {
+                temp.AsSpan(0, read).CopyTo(buffer);
+            }
+
+            return read;
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return(temp);
+        }
 #else
         return _input.Read(buffer);
 #endif
