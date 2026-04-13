@@ -65,11 +65,13 @@ public partial struct ParseState<TToken>
             _span.Length
         ).Slice(start, end);
 #else
-        var input = new StringBuilder(end);
+        var inputString = new StringBuilder(end);
         for (var j = start; j < start + end; j++)
         {
-            input.Append(_span[j]);
+            inputString.Append(_span[j]);
         }
+
+        var input = inputString.ToString();
 #endif
         var lines = 0;
         var cols = 0;
